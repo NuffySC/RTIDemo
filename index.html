@@ -5,30 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RTI</title>
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     
     <section class="header">
-
         <div class="text-box">
-            <h1>
-                Title
-            </h1>
+            <h1>Title</h1>
+
             <p>
                 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Tenetur sed qui minus maxime similique hic cum, <br> culpa id reiciendis impedit reprehenderit veritatis quibusdam beatae accusantium voluptas laboriosam ut libero explicabo!
             </p>
-            <a href="" class="hero-btn">Button</a>
-        </div>
 
+            <!-- Upload UI -->
+            <input type="file" id="videoInput" accept="video/*"><br><br>
+            <button onclick="uploadVideo()" class="hero-btn">Upload Video</button>
+
+            <p id="status"></p>
+        </div>
     </section>
 
+<script>
+const supabase = window.supabase.createClient(
+  "qbbrwqevxydqzpdupstw",
+  "sb_publishable_tW5bOdbxWzd11ekGSawqWg_HT32fKx5"
+);
 
+async function uploadVideo() {
+  const file = document.getElementById("videoInput").files[0];
+  if (!file) return alert("Select video first");
 
+  const fileName = Date.now() + "-" + file.name;
 
+  document.getElementById("status").innerText = "Uploading...";
 
+  const { error } = await supabase.storage
+    .from("videos")
+    .upload(fileName, file);
+
+  if (error) {
+    document.getElementById("status").innerText = "Upload failed";
+    console.error(error);
+    return;
+  }
+
+  const { data } = supabase.storage
+    .from("videos")
+    .getPublicUrl(fileName);
+
+  document.getElementById("status").innerText =
+    "Uploaded Video URL: " + data.publicUrl;
+}
+</script>
 
 </body>
-
-
-
 </html>
